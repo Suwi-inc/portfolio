@@ -187,7 +187,7 @@ document.getElementById('contactform').addEventListener('submit', function(event
   const email = encodeURIComponent(document.getElementById('email').value).toString();
   const message = encodeURIComponent(document.getElementById('message-contact').value).toString();
 
-  const apiUrl = `http://87.120.36.175:8080/api/send?name=${name}&email=${email}&message=${message}`;
+  const apiUrl = `https://87.120.36.175:8080/api/send?name=${name}&email=${email}&message=${message}`;
   
   fetch(apiUrl, {
      method: 'POST',
