@@ -181,25 +181,25 @@ themeButton.addEventListener("click", () => {
   localStorage.setItem("selected-icon", getCurrentIcon());
 });
 
-document.getElementById('contactform').addEventListener('submit', function(event) {
-  event.preventDefault(); 
+document.getElementById('contactform').addEventListener('submit', function (event) {
+  event.preventDefault();
   const name = encodeURIComponent(document.getElementById('name').value).toString();
   const email = encodeURIComponent(document.getElementById('email').value).toString();
   const message = encodeURIComponent(document.getElementById('message-contact').value).toString();
 
-  const apiUrl = `https://suwilanji.online:8080/api/send?name=${name}&email=${email}&message=${message}`;
-  
+  // const apiUrl = ``;
+
   fetch(apiUrl, {
-     method: 'POST',
-      })
-  .then(response => response.text())
-  .then(data => {
+    method: 'POST',
+  })
+    .then(response => response.text())
+    .then(data => {
       document.getElementById('responseMessage').innerHTML = 'Message sent successfully!';
       document.getElementById('contactform').reset(); // Reset the form
-  })
-  .catch(error => {
-      document.getElementById('responseMessage').innerHTML = `Error sending message. Please try again. ${error}`; //remove later
-  });
+    })
+    .catch(error => {
+      document.getElementById('responseMessage').innerHTML = `Error sending message. Please try again. ${error}`;
+    });
 });
 
 
