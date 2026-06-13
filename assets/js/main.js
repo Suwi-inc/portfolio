@@ -1,207 +1,168 @@
-/*==================== MENU SHOW Y HIDDEN ====================*/
-const navMenu = document.getElementById("nav-menu"),
-  navToggle = document.getElementById("nav-toggle"),
-  navClose = document.getElementById("nav-close");
+const navMenu = document.getElementById("nav-menu");
+const navToggle = document.getElementById("nav-toggle");
+const navClose = document.getElementById("nav-close");
+const navLinks = document.querySelectorAll(".nav__link");
+const header = document.getElementById("header");
+const scrollUp = document.getElementById("scroll-up");
+const themeButton = document.getElementById("theme-button");
+const contactForm = document.getElementById("contact-form");
+const formStatus = document.getElementById("form-status");
 
-/*===== MENU SHOW =====*/
-/* Validate if constant exists */
-if (navToggle) {
-  navToggle.addEventListener("click", () => {
-    navMenu.classList.add("show-menu");
-  });
-}
-
-/*===== MENU HIDDEN =====*/
-/* Validate if constant exists */
-if (navClose) {
-  navClose.addEventListener("click", () => {
-    navMenu.classList.remove("show-menu");
-  });
-}
-
-/*==================== REMOVE MENU MOBILE ====================*/
-const navLink = document.querySelectorAll(".nav__link");
-
-function linkAction() {
-  const navMenu = document.getElementById("nav-menu");
-  // When we click on each nav__link, we remove the show-menu class
-  navMenu.classList.remove("show-menu");
-}
-navLink.forEach((n) => n.addEventListener("click", linkAction));
-
-/*==================== ACCORDION SKILLS ====================*/
-const skillsContent = document.getElementsByClassName("skills__content"),
-  skillsHeader = document.querySelectorAll(".skills__header");
-
-function toggleSkills() {
-  let itemClass = this.parentNode.className;
-
-  for (i = 0; i < skillsContent.length; i++) {
-    skillsContent[i].className = "skills__content skills__close";
-  }
-
-  if (itemClass === "skills__content skills__close") {
-    this.parentNode.className = "skills__content skills__open";
+function trackEvent(eventName, label = "") {
+  if (typeof window.gtag === "function") {
+    window.gtag("event", eventName, {
+      event_category: "portfolio",
+      event_label: label || eventName,
+    });
   }
 }
 
-skillsHeader.forEach((el) => {
-  el.addEventListener("click", toggleSkills);
-});
+function openMenu() {
+  navMenu?.classList.add("show-menu");
+  document.body.classList.add("nav-open");
+}
 
-/*==================== QUALIFICATION TABS ====================*/
-const tabs = document.querySelectorAll("[data-target]"),
-  tabContents = document.querySelectorAll("[data-content]");
+function closeMenu() {
+  navMenu?.classList.remove("show-menu");
+  document.body.classList.remove("nav-open");
+}
 
-tabs.forEach((tab) => {
-  tab.addEventListener("click", () => {
-    const target = document.querySelector(tab.dataset.target);
+navToggle?.addEventListener("click", openMenu);
+navClose?.addEventListener("click", closeMenu);
 
-    tabContents.forEach((tabContent) => {
-      tabContent.classList.remove("qualification__active");
-    });
-
-    target.classList.add("qualification__active");
-
-    tabs.forEach((tab) => {
-      tab.classList.remove("qualification__active");
-    });
-    tab.classList.add("qualification__active");
-  });
-});
-/*==================== SERVICES MODAL ====================*/
-const modalViews = document.querySelectorAll(".services__modal"),
-  modalBtns = document.querySelectorAll(".services__button"),
-  modalCloses = document.querySelectorAll(".services__modal-close");
-
-let modal = function (modalClick) {
-  modalViews[modalClick].classList.add("active-modal");
-};
-
-modalBtns.forEach((modalBtn, i) => {
-  modalBtn.addEventListener("click", () => {
-    modal(i);
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    closeMenu();
+    trackEvent("nav_click", link.getAttribute("href") || link.textContent.trim());
   });
 });
 
-modalCloses.forEach((modalClose) => {
-  modalClose.addEventListener("click", () => {
-    modalViews.forEach((modalView) => {
-      modalView.classList.remove("active-modal");
-    });
+document.querySelectorAll("[data-track]").forEach((element) => {
+  element.addEventListener("click", () => {
+    trackEvent(element.dataset.track, element.textContent.trim());
   });
 });
-/*==================== PORTFOLIO SWIPER  ====================*/
-let swiperPortofolio = new Swiper(".portfolio__container", {
-  cssMode: true,
-  loop: true,
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-});
 
-/*==================== SCROLL SECTIONS ACTIVE LINK ====================*/
-const sections = document.querySelectorAll("section[id]");
+function updateHeaderAndScrollButton() {
+  if (window.scrollY >= 40) {
+    header?.classList.add("scroll-header");
+  } else {
+    header?.classList.remove("scroll-header");
+  }
 
-function scrollActive() {
-  const scrollY = window.pageYOffset;
+  if (window.scrollY >= 560) {
+    scrollUp?.classList.add("show-scroll");
+  } else {
+    scrollUp?.classList.remove("show-scroll");
+  }
+}
 
-  sections.forEach((current) => {
-    const sectionHeight = current.offsetHeight;
-    const sectionTop = current.offsetTop - 50;
-    sectionId = current.getAttribute("id");
+window.addEventListener("scroll", updateHeaderAndScrollButton);
+updateHeaderAndScrollButton();
 
-    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-      document
-        .querySelector(".nav__menu a[href*=" + sectionId + "]")
-        .classList.add("active-link");
-    } else {
-      document
-        .querySelector(".nav__menu a[href*=" + sectionId + "]")
-        .classList.remove("active-link");
+function activateNavLink() {
+  const sections = document.querySelectorAll("section[id]");
+  const scrollPosition = window.scrollY + 160;
+
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.offsetHeight;
+    const sectionId = section.getAttribute("id");
+    const navLink = document.querySelector(`.nav__link[href="#${sectionId}"]`);
+
+    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+      navLinks.forEach((link) => link.classList.remove("active-link"));
+      navLink?.classList.add("active-link");
     }
   });
 }
-window.addEventListener("scroll", scrollActive);
 
-/*==================== CHANGE BACKGROUND HEADER ====================*/
-function scrollHeader() {
-  const nav = document.getElementById("header");
-  // When the scroll is greater than 200 viewport height, add the scroll-header class to the header tag
-  if (this.scrollY >= 80) nav.classList.add("scroll-header");
-  else nav.classList.remove("scroll-header");
-}
-window.addEventListener("scroll", scrollHeader);
-/*==================== SHOW SCROLL UP ====================*/
-function scrollUp() {
-  const scrollUp = document.getElementById("scroll-up");
-  // When the scroll is higher than 560 viewport height, add the show-scroll class to the a tag with the scroll-top class
-  if (this.scrollY >= 560) scrollUp.classList.add("show-scroll");
-  else scrollUp.classList.remove("show-scroll");
-}
-window.addEventListener("scroll", scrollUp);
-/*==================== DARK LIGHT THEME ====================*/
-const themeButton = document.getElementById("theme-button");
-const darkTheme = "dark-theme";
-const iconTheme = "uil-sun";
+window.addEventListener("scroll", activateNavLink);
+activateNavLink();
 
-// Previously selected topic (if user selected)
-const selectedTheme = localStorage.getItem("selected-theme");
-const selectedIcon = localStorage.getItem("selected-icon");
-
-// We obtain the current theme that the interface has by validating the dark-theme class
-const getCurrentTheme = () =>
-  document.body.classList.contains(darkTheme) ? "dark" : "light";
-const getCurrentIcon = () =>
-  themeButton.classList.contains(iconTheme) ? "uil-moon" : "uil-sun";
-
-// We validate if the user previously chose a topic
-if (selectedTheme) {
-  // If the validation is fulfilled, we ask what the issue was to know if we activated or deactivated the dark
-  document.body.classList[selectedTheme === "dark" ? "add" : "remove"](
-    darkTheme
-  );
-  themeButton.classList[selectedIcon === "uil-moon" ? "add" : "remove"](
-    iconTheme
-  );
+const savedTheme = localStorage.getItem("portfolio-theme");
+if (savedTheme === "dark") {
+  document.body.classList.add("dark-theme");
+  themeButton?.querySelector("i")?.classList.replace("uil-moon", "uil-sun");
 }
 
-// Activate / deactivate the theme manually with the button
-themeButton.addEventListener("click", () => {
-  // Add or remove the dark / icon theme
-  document.body.classList.toggle(darkTheme);
-  themeButton.classList.toggle(iconTheme);
-  // We save the theme and the current icon that the user chose
-  localStorage.setItem("selected-theme", getCurrentTheme());
-  localStorage.setItem("selected-icon", getCurrentIcon());
+themeButton?.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("dark-theme");
+  localStorage.setItem("portfolio-theme", isDark ? "dark" : "light");
+
+  const icon = themeButton.querySelector("i");
+  if (icon) {
+    icon.classList.toggle("uil-moon", !isDark);
+    icon.classList.toggle("uil-sun", isDark);
+  }
+
+  trackEvent("theme_toggle", isDark ? "dark" : "light");
 });
 
-document.getElementById('contactform').addEventListener('submit', function (event) {
+const experienceTabs = document.querySelectorAll(".experience__tab");
+const experiencePanels = document.querySelectorAll(".experience__panel");
+
+experienceTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.tab;
+
+    experienceTabs.forEach((item) => item.classList.remove("active"));
+    experiencePanels.forEach((panel) => panel.classList.remove("active"));
+
+    tab.classList.add("active");
+    document.getElementById(`${target}-panel`)?.classList.add("active");
+
+    trackEvent("experience_tab", target);
+  });
+});
+
+async function submitContactForm(event) {
   event.preventDefault();
-  const name = encodeURIComponent(document.getElementById('name').value).toString();
-  const email = encodeURIComponent(document.getElementById('email').value).toString();
-  const message = encodeURIComponent(document.getElementById('message-contact').value).toString();
 
-  // const apiUrl = ``;
+  if (!contactForm || !formStatus) return;
 
-  fetch(apiUrl, {
-    method: 'POST',
-  })
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('responseMessage').innerHTML = 'Message sent successfully!';
-      document.getElementById('contactform').reset(); // Reset the form
-    })
-    .catch(error => {
-      document.getElementById('responseMessage').innerHTML = `Error sending message. Please try again. ${error}`;
+  const submitButton = contactForm.querySelector("button[type='submit']");
+  const formData = new FormData(contactForm);
+
+  formStatus.textContent = "Sending your message...";
+  formStatus.className = "form__status";
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.style.opacity = "0.75";
+  }
+
+  try {
+    const response = await fetch(contactForm.action, {
+      method: contactForm.method,
+      body: formData,
+      headers: {
+        Accept: "application/json",
+      },
     });
-});
 
+    if (response.ok) {
+      contactForm.reset();
+      formStatus.textContent = "Message sent successfully. I’ll get back to you soon.";
+      formStatus.classList.add("success");
+      trackEvent("contact_form_submit", "success");
+    } else {
+      const data = await response.json().catch(() => null);
+      const message = data?.errors?.[0]?.message || "Something went wrong. Please try again.";
+      formStatus.textContent = message;
+      formStatus.classList.add("error");
+      trackEvent("contact_form_submit", "error");
+    }
+  } catch (error) {
+    formStatus.textContent = "Network error. Please email me directly instead.";
+    formStatus.classList.add("error");
+    trackEvent("contact_form_submit", "network_error");
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.style.opacity = "1";
+    }
+  }
+}
 
-
-
+contactForm?.addEventListener("submit", submitContactForm);
